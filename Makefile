@@ -1,17 +1,18 @@
-PHONY: all clean
-MODULE_PATH=
+.PHONY: all clean run
 
 all: example.jar main.jar
 
 
-src/main/Main.class: JAVAC_ARGS=--module-path example.jar
-src/main/Main.class: example.jar
+src/main/main/Main.class: JAVAC_ARGS=--module-path example.jar
+src/main/main/Main.class: example.jar
+src/main/module-info.class: JAVAC_ARGS=--module-path example.jar
+src/main/module-info.class: example.jar
+
+main.jar: src/main/main/Main.class src/main/module-info.class
+	jar --create --file $@ -C src/main main/Main.class -C src/main module-info.class
 
 example.jar: src/module/com/example/Main.class src/module/module-info.class
-main.jar: src/main/Main.class src/main/module-info.class
-
-%.jar:
-	jar --create --file $@ $^
+	jar --create --file $@ -C src/module com/example/Main.class -C src/module module-info.class
 
 src/module/%.class: src/module/%.java
 	javac --source-path src/module $< $(JAVAC_ARGS)
@@ -19,6 +20,9 @@ src/module/%.class: src/module/%.java
 src/main/%.class: src/main/%.java
 	javac --source-path src/main $< $(JAVAC_ARGS)
 
+run: all
+	java --module-path example.jar:main.jar --module main/main.Main
+
 clean:
-	find . -name *.jar -delete
-	find . -name *.class -delete
+	-find . -name "*.jar" -delete
+	-find . -name "*.class" -delete
