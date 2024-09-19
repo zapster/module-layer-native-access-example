@@ -27,7 +27,7 @@ src/main/%.class: src/main/%.java
 	javac --source-path src/main $< $(JAVAC_ARGS)
 
 run: all
-	java --module-path example.jar:main.jar --enable-native-access example --enable-native-access example2 --module main/main.Main
+	java --module-path example.jar:main.jar --enable-native-access example --enable-native-access otherexample --module main/main.Main
 
 clean:
 	-find . -name "*.jar" -delete
