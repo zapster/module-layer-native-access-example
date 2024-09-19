@@ -1,7 +1,7 @@
 .PHONY: all clean run run-agent run-native
 
 CONFIG_DIR=./config-dir
-ALL_ARTIFACTS: example.jar example2.jar main.jar
+ALL_ARTIFACTS=example.jar example2.jar main.jar
 
 
 all: ${ALL_ARTIFACTS}
