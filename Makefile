@@ -29,6 +29,13 @@ src/main/%.class: src/main/%.java
 run: all
 	java --module-path example.jar:main.jar --enable-native-access example --enable-native-access main --module main/main.Main
 
+run-native: main-main
+	./$<
+
+main-main: all
+	test -n "${GRAALVM_HOME}"
+	${GRAALVM_HOME}/bin/native-image --module-path example.jar:main.jar --enable-native-access example --enable-native-access main --module main/main.Main -o $@
+
 clean:
 	-find . -name "*.jar" -delete
 	-find . -name "*.class" -delete
