@@ -1,6 +1,10 @@
-.PHONY: all clean run
+.PHONY: all clean run run-agent run-native
 
-all: example.jar example2.jar main.jar
+CONFIG_DIR=./config-dir
+ALL_ARTIFACTS: example.jar example2.jar main.jar
+
+
+all: ${ALL_ARTIFACTS}
 
 
 src/main/main/Main.class: JAVAC_ARGS=--module-path example.jar
@@ -29,13 +33,21 @@ src/main/%.class: src/main/%.java
 run: all
 	java --module-path example.jar:main.jar --enable-native-access example --enable-native-access main --module main/main.Main
 
-run-native: main-main
+run-agent: ${CONFIG_DIR}/reachability-metadata.json
+
+${CONFIG_DIR}/reachability-metadata.json: ${ALL_ARTIFACTS}
+	test -n "${GRAALVM_HOME}"
+	${GRAALVM_HOME}/bin/java -agentlib:native-image-agent=config-output-dir=${CONFIG_DIR} --module-path example.jar:main.jar --enable-native-access example --enable-native-access main --module main/main.Main
+
+run-native: main.main
 	./$<
 
-main-main: all
+main.main: ${CONFIG_DIR}/reachability-metadata.json
 	test -n "${GRAALVM_HOME}"
-	${GRAALVM_HOME}/bin/native-image --module-path example.jar:main.jar --enable-native-access example --enable-native-access main --module main/main.Main -o $@
+	${GRAALVM_HOME}/bin/native-image -H:ConfigurationFileDirectories=${CONFIG_DIR} --module-path example.jar:main.jar --enable-native-access example --enable-native-access main --module main/main.Main -o $@
 
 clean:
 	-find . -name "*.jar" -delete
 	-find . -name "*.class" -delete
+	-rm -rf main.main
+	-rm -rf ${CONFIG_DIR}
