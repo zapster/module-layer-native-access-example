@@ -13,7 +13,7 @@ public class Main {
         System.out.println(Main.class.getModule());
         com.example.Main.main(args);
         // module layer
-        ModuleFinder finder = ModuleFinder.of(Path.of("."));
+        ModuleFinder finder = ModuleFinder.of(Path.of("example2.jar"));
         ModuleLayer parent = ModuleLayer.boot();
         Configuration cf = parent.configuration().resolve(finder, ModuleFinder.of(), Set.of("otherexample"));
         ClassLoader scl = ClassLoader.getSystemClassLoader();
